@@ -1,12 +1,12 @@
 """
-Django settings for gettingstarted project, on Heroku. For more info, see:
+Django settings for amnh_observer project, on Heroku. For more info, see:
 https://github.com/heroku/heroku-django-template
 
 For more information on this file, see
-https://docs.djangoproject.com/en/1.8/topics/settings/
+https://docs.djangoproject.com/en/1.9/topics/settings/
 
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/1.8/ref/settings/
+https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
@@ -19,7 +19,7 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
+# See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: change this before deploying to production!
 SECRET_KEY = 'i+acxn5(akgsn!sr4^qgf(^m&*@+g1@u^t@=8s@axc41ml*f=s'
@@ -37,7 +37,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'hello'
+    'turtle_observer',
+    'model_report',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -51,7 +52,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
-ROOT_URLCONF = 'gettingstarted.urls'
+ROOT_URLCONF = 'amnh_observer.urls'
 
 TEMPLATES = [
     {
@@ -70,7 +71,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'gettingstarted.wsgi.application'
+WSGI_APPLICATION = 'amnh_observer.wsgi.application'
 
 
 # Database
@@ -78,10 +79,15 @@ WSGI_APPLICATION = 'gettingstarted.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'turtle_db',
+        'USER': 'mikecap',
+        'PASSWORD': '',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
@@ -135,4 +141,3 @@ STATICFILES_DIRS = (
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
-

@@ -1,0 +1,9 @@
+{% if observation_list %}
+    <ul>
+    {% for observation in observation_list %}
+        <li><a href="{% url 'turtle_observer:detail' observation.turtle_id %}">{{ observation.turtle_id }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No observations are available.</p>
+{% endif %}
