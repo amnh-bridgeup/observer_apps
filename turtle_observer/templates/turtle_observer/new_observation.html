@@ -1,0 +1,34 @@
+<h1>{{ expedition }} -- {{ location }}</h1>
+
+{% if turtle %}
+Turtle with Pit Tag ID {{ turtle.turtle_pit_tag_id }} found!
+<ul>
+    <li>Species: {{ turtle.turtle_species }}
+    <li>Sex: {{ turtle.turtle_sex }}
+</ul>
+
+Last 3 observations:
+<ul>
+    {% if last_observed %}
+        {% for observation in last_observed %}
+            <li>{{ observation.observation_date }} -- {{ observation.location }}, Age: {{ observation.age_in_years }}</li>
+        {% endfor %}
+    {% else %}
+        <li>No observations.</li>
+    {% endif %}
+</ul>
+{% endif %}
+<hr>
+
+<h2>Add New Observation</h2>
+
+<form action="{% url 'turtle_observer:new_observation' expedition_id=expedition.id location_id=location.id turtle_id=turtle.id %}" method="POST">
+    {% csrf_token %}
+    <ul>
+    {{ form.as_ul }}
+    <li>&nbsp;</li>
+    <li><input type="submit" name="submit" value="Add New Observation" /></li>
+    </ul>
+</form>
+
+<p><a href="{% url 'turtle_observer:index' %}">Restart Turtle Observation</a></p>

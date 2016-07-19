@@ -1,9 +1,31 @@
-{% if observation_list %}
-    <ul>
-    {% for observation in observation_list %}
-        <li><a href="{% url 'turtle_observer:detail' observation.turtle_id %}">{{ observation.turtle_id }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No observations are available.</p>
-{% endif %}
+<h1>{{ expedition }}</h1>
+
+<h2>Select Location, Enter Pit Tag ID To Search Or Add New Turtle</h2>
+
+{{ error_message }}
+
+<form action="{% url 'turtle_observer:index' %}" method="POST">
+{% csrf_token %}
+    <p>
+        <ul>
+            <li><label for="location">Your Location: </label> <select name="location" id="location">
+
+            {% for each_location in location_list.all %}
+                {% if each_location.location_code == location.location_code %}
+                    <option value="{{ each_location.location_code }}" selected>{{ each_location.location_name }}</option>
+                {% else %}
+                    <option value="{{ each_location.location_code }}">{{ each_location.location_name }}</option>
+                {% endif %}
+            {% empty %}
+                <option value="">No locations!</option>
+            {% endfor %}
+            </select></li>
+
+            <li><label for="turtle_pit_tag_id">Turtle's Pit Tag ID: </label>
+            <input type="text" name="turtle_pit_tag_id" id="turtle_pit_tag_id" value="{{ turtle_pit_tag_id }}" /></li>
+            <li>&nbsp;</li>
+            <li><input type="submit" name="submit" value="Search For Turtle" /></li>
+            <li><input type="submit" name="submit" value="Add A New Turtle" /></li>
+        </ul>
+    </p>
+</form>

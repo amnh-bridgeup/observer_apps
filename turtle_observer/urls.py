@@ -18,15 +18,9 @@ from django.conf.urls import url
 from . import views
 
 app_name = 'turtle_observer'
+
 urlpatterns = [
-    # ex: /turtles/
     url(r'^$', views.index, name='index'),
-    # ex: /turtles/new/
-    url(r'^new/$', views.new_turtle, name='new_turtle'),
-    # ex: /turtles/search/5/
-    url(r'^search/$', views.results, name='search'),
-    # ex: /turtles/5/
-    url(r'^(?P<turtle_id>[0-9]+)/$', views.detail, name='detail'),
-    # ex: /turtles/5/results/
-    url(r'^(?P<turtle_pit_tag_id>[0-9]+)/results/$', views.results, name='results'),
+    url(r'^new/(?P<expedition_id>[0-9]+)/(?P<location_id>[0-9]+)/$', views.new_turtle, name='new_turtle'),
+    url(r'^observe/(?P<expedition_id>[0-9]+)/(?P<location_id>[0-9]+)/(?P<turtle_id>[0-9]+)/$', views.new_observation, name='new_observation'),
 ]
