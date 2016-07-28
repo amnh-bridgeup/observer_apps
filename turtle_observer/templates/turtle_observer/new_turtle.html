@@ -1,4 +1,15 @@
-<h1>{{ expedition }} -- {{ location }}</h1>
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title %}
+Add A New Turtle
+{% endblock %}
+
+{% block content_header %}
+  <h1>{{ expedition }} -- {{ location }}</h1>
+{% endblock %}
+{% block content %}
+
+<p style="font-style: italic">(Select Location, Enter Pit Tag ID and press Search For Turtle, or just Add New Turtle)</p>
 
 <h2>Add New Turtle</h2>
 
@@ -12,3 +23,4 @@
 </form>
 
 <p><a href="{% url 'turtle_observer:index' %}">Restart Turtle Observation</a></p>
+{% endblock %}

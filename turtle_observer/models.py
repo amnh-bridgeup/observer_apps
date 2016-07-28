@@ -5,45 +5,6 @@ from django.forms import ModelForm
 from django.contrib.auth.models import User
 from django.utils.encoding import python_2_unicode_compatible
 
-TURTLE_SPECIES_CHOICES = (
-    ('Cpp', 'Eastern Painted (Chrysemys picta picta)'),
-    ('Css', 'Eastern Snapping (Chelydra serpentina serpentina)'),
-    ('Tcc', 'Eastern Box (Terrapene carolina carolina)'),
-    ('Tse', 'Red-eared Slider (Trachemys scripta elegans)'),
-    ('O', 'Other'),
-    ('U', 'Unknown'),
-)
-
-TURTLE_SEX_CHOICES = (
-    ('M', 'Male'),
-    ('F', 'Female'),
-    ('U', 'Unknown'),
-)
-
-TRAP_TYPE_CHOICES = (
-    ('hoop', 'Hoop Trap'),
-    ('bask-m', 'Basking Trap M'),
-    ('bask-p', 'Basking Trap P'),
-    ('snrkl', 'By Snorkeling'),
-    ('hand', 'By Hand'),
-)
-
-AGE_IN_YEARS_CHOICES = (
-    ('Juvenile', 'Juvenile'),
-    ('1', '1 year'),
-    ('2', '2 years'),
-    ('3', '3 years'),
-    ('4', '4 years'),
-    ('Adult', 'Adult'),
-    ('5', '5 years'),
-    ('6', '6 years'),
-    ('7', '7 years'),
-    ('8', '8 years'),
-    ('9', '9 years'),
-    ('10', '10 years'),
-    ('10+', 'Over 10 years'),
-    ('Worn', 'Worn'),
-)
 
 @python_2_unicode_compatible
 class Location(models.Model):
@@ -55,6 +16,7 @@ class Location(models.Model):
     def __str__(self):
         return self.location_code + ': ' + self.location_name
 
+
 @python_2_unicode_compatible
 class Expedition(models.Model):
     expedition_start_date = models.DateTimeField()
@@ -63,6 +25,7 @@ class Expedition(models.Model):
 
     def __str__(self):
         return 'Expedition ' + unicode(self.id) + ': ' + self.expedition_start_date.strftime('%Y%m%d').decode() + ' - ' + self.expedition_end_date.strftime('%Y%m%d').decode()
+
 
 @python_2_unicode_compatible
 class Observer(models.Model):
@@ -73,8 +36,24 @@ class Observer(models.Model):
     def __str__(self):
         return self.observer_name
 
+
 @python_2_unicode_compatible
 class Turtle(models.Model):
+    TURTLE_SPECIES_CHOICES = (
+        ('Cpp', 'Eastern Painted (Chrysemys picta picta)'),
+        ('Css', 'Eastern Snapping (Chelydra serpentina serpentina)'),
+        ('Tcc', 'Eastern Box (Terrapene carolina carolina)'),
+        ('Tse', 'Red-eared Slider (Trachemys scripta elegans)'),
+        ('O', 'Other'),
+        ('U', 'Unknown'),
+    )
+
+    TURTLE_SEX_CHOICES = (
+        ('M', 'Male'),
+        ('F', 'Female'),
+        ('U', 'Unknown'),
+    )
+
     turtle_pit_tag_id = models.CharField(max_length=200)
     turtle_species = models.CharField(max_length=200, blank=True, null=True, choices=TURTLE_SPECIES_CHOICES)
     turtle_sex = models.CharField(max_length=10, blank=True, null=True, choices=TURTLE_SEX_CHOICES)
@@ -82,12 +61,38 @@ class Turtle(models.Model):
     def __str__(self):
         return self.turtle_pit_tag_id
 
+
 @python_2_unicode_compatible
 class Observation(models.Model):
+    TRAP_TYPE_CHOICES = (
+        ('hoop', 'Hoop Trap'),
+        ('bask-m', 'Basking Trap M'),
+        ('bask-p', 'Basking Trap P'),
+        ('snrkl', 'By Snorkeling'),
+        ('hand', 'By Hand'),
+    )
+
+    AGE_IN_YEARS_CHOICES = (
+        ('Juvenile', 'Juvenile'),
+        ('1', '1 year'),
+        ('2', '2 years'),
+        ('3', '3 years'),
+        ('4', '4 years'),
+        ('Adult', 'Adult'),
+        ('5', '5 years'),
+        ('6', '6 years'),
+        ('7', '7 years'),
+        ('8', '8 years'),
+        ('9', '9 years'),
+        ('10', '10 years'),
+        ('10+', 'Over 10 years'),
+        ('Worn', 'Worn'),
+    )
+
     expedition = models.ForeignKey(Expedition, on_delete=models.CASCADE)
-    location = models.ForeignKey(Location, on_delete=models.CASCADE, default=1)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE)
     turtle_id = models.IntegerField(blank=True, null=True)
-    observation_legacy_id = models.CharField(max_length=200)
+    observation_legacy_id = models.CharField(max_length=200, blank=True, null=True)
     observation_date = models.DateTimeField(auto_now_add=True)
     pond_location = models.CharField(max_length=400, blank=True, null=True)
     recaptured = models.BooleanField(default=0)
@@ -105,12 +110,15 @@ class Observation(models.Model):
     def __str__(self):
         return '(' + str(self.expedition) + '): ' + self.observation_date.strftime('%Y%m%d').decode() + ' - ' + str(self.location)
 
+
+
 class TurtleForm(ModelForm):
     class Meta:
         model = Turtle
         fields = ['turtle_pit_tag_id', 'turtle_species', 'turtle_sex']
 
+
 class ObservationForm(ModelForm):
     class Meta:
         model = Observation
-        fields = ['pond_location', 'trap_type', 'bait', 'age_in_years', 'mass_in_grams', 'carapace_length_cm', 'carapace_width_cm', 'carapace_height_cm', 'plastron_length_cm', 'observation_notes', 'observers']
+        fields = ['expedition','location','turtle_id','pond_location', 'trap_type', 'bait', 'age_in_years', 'mass_in_grams', 'carapace_length_cm', 'carapace_width_cm', 'carapace_height_cm', 'plastron_length_cm', 'observation_notes', 'observers']

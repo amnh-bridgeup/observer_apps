@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title %}
+Log Out
+{% endblock %}
+
+{% block content_header %}
+  <h1>Logged out</h1>
+{% endblock %}
+{% block content %}
+
+<p><a href="{% url 'django.contrib.auth.views.login' %}">Log back in</a></p>
+{% endblock %}

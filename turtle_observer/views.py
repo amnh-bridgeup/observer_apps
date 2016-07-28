@@ -1,10 +1,12 @@
 import os, requests
 from datetime import datetime
 
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect
-from django.template import loader
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404
+from django.template import loader
 from django.utils import timezone
 
 from .models import Location, Expedition, Observer, Turtle, Observation
@@ -12,6 +14,46 @@ from .models import TurtleForm, ObservationForm
 
 
 def index(request):
+    return render(request, 'turtle_observer/index.html')
+
+
+#def reports(request):
+#    return render(request, 'turtle_observer/index.html')
+
+
+def login_submit(request):
+    username = request.POST['username']
+    password = request.POST['password']
+
+    user = authenticate(username=username, password=password)
+
+    if user is not None:
+        if user.is_active:
+            login(request, user)
+
+            # Redirect to a success page.
+            return HttpResponseRedirect(reverse('turtle_observer:search', kwargs={}))
+        else:
+            # Return a 'disabled account' error message
+            context['error_message'] = "This user has been disabled. Please contact administrators if this is in error."
+
+            return render(request, 'turtle_observer/login_fail.html', context)
+    else:
+        # Return an 'invalid login' error message.
+        context['error_message'] = "You didn't enter the right username or password, please try again."
+
+        return render(request, 'turtle_observer/login_fail.html', context)
+
+
+def logout_view(request):
+    logout(request)
+
+    # Redirect to a success page.
+    return HttpResponseRedirect(reverse('turtle_observer:index', kwargs={}))
+
+
+@login_required(login_url="login/")
+def search(request):
     # Get current expedition and locations
     this_expedition = Expedition.objects.get(expedition_start_date__lte=timezone.now(), expedition_end_date__gte=timezone.now())
     expedition_locations = Location.objects.all().order_by('location_lat').order_by('location_long')
@@ -37,28 +79,28 @@ def index(request):
                 context['turtle_pit_tag_id'] = request.POST['turtle_pit_tag_id']
                 context['error_message'] = "You didn't find a turtle with that Pit Tag ID. Try again or add a new turtle."
 
-                return render(request, 'turtle_observer/index.html', context)
+                return render(request, 'turtle_observer/search.html', context)
             else:
                 # Turtle found
                 context = {'turtle_id': found_turtle.id, 'expedition_id': this_expedition.id, 'location_id': this_location.id}
 
                 return HttpResponseRedirect(reverse('turtle_observer:new_observation', kwargs=context))
 
-    return render(request, 'turtle_observer/index.html', context)
+    return render(request, 'turtle_observer/search.html', context)
 
 
+@login_required(login_url="login/")
 def new_turtle(request, expedition_id, location_id):
     this_expedition = Expedition.objects.get(pk=expedition_id)
     this_location = Location.objects.get(pk=location_id)
 
     if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
+        # Create a form instance and populate it with data from the request:
         turtle_form = TurtleForm(request.POST)
 
-        # check whether it's valid:
         if turtle_form.is_valid():
             # Create new turtle object and save the data
-            this_turtle = None
+            this_turtle = turtle_form.save()
 
             context = {'location_id': this_location.id, 'expedition_id': this_expedition.id, 'turtle_id': this_turtle.id}
 
@@ -72,6 +114,7 @@ def new_turtle(request, expedition_id, location_id):
     return render(request, 'turtle_observer/new_turtle.html', context)
 
 
+@login_required(login_url="login/")
 def new_observation(request, expedition_id, location_id, turtle_id):
     this_expedition = Expedition.objects.get(pk=expedition_id)
     this_location = Location.objects.get(pk=location_id)
@@ -82,17 +125,18 @@ def new_observation(request, expedition_id, location_id, turtle_id):
     context = {'expedition': this_expedition, 'location': this_location, 'turtle': this_turtle, 'last_observed': last_observations}
 
     if request.method == 'POST':
-#    if request.POST['submit'] == "Add New Observation":
         observation_form = ObservationForm(request.POST)
 
-        return render(request, 'turtle_observer/new_observation.html', {
-            'message': "New turtle observation entered!",
-        })
-    else:
-        # Get all relevant observation hidden field data
+        if observation_form.is_valid():
+            # Create new turtle object and save the data
+            this_observation = observation_form.save()
 
+            context['observation'] = this_observation
+
+            return render(request, 'turtle_observer/complete.html', context)
+    else:
         # Create blank observation form
-        observation_form = ObservationForm()
+        observation_form = ObservationForm(initial={'expedition': this_expedition.id, 'location': this_location.id, 'turtle_id': this_turtle.id})
 
     context['form'] = observation_form
 

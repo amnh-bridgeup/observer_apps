@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title %}
+Cannot Log In
+{% endblock %}
+
+{% block content_header %}
+  <h1>Your Login Attempt Failed</h1>
+{% endblock %}
+{% block content %}
+
+<p><a href="{% url 'django.contrib.auth.views.login' %}">Try to log back in</a></p>
+{% endblock %}

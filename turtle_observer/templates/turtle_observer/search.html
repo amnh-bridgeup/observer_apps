@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title %}
+Search For A Turtle
+{% endblock %}
+
+{% block content_header %}
+  <h1>{{ expedition }}</h1>
+{% endblock %}
+{% block content %}
+
+<p style="font-style: italic">(Select Location, Enter Pit Tag ID and press Search For Turtle, or just Add New Turtle)</p>
+
+<form action="{% url 'turtle_observer:search' %}" method="POST">
+{% csrf_token %}
+  <p>
+    <ul>
+      <li><label for="location">Your Location: </label> 
+        <select name="location" id="location">
+          {% for each_location in location_list.all %}
+            {% if each_location.location_code == location.location_code %}
+              <option value="{{ each_location.location_code }}" selected>{{ each_location.location_name }}</option>
+            {% else %}
+              <option value="{{ each_location.location_code }}">{{ each_location.location_name }}</option>
+            {% endif %}
+          {% empty %}
+              <option value="">No locations!</option>
+          {% endfor %}
+        </select>
+      </li>
+      <li>
+        <label for="turtle_pit_tag_id">Turtle's Pit Tag ID: </label>
+        <input type="text" name="turtle_pit_tag_id" id="turtle_pit_tag_id" value="{{ turtle_pit_tag_id }}" />
+      </li>
+      <li>&nbsp;</li>
+      <li><input type="submit" name="submit" value="Search For Turtle" /> &nbsp; <input type="submit" name="submit" value="Add A New Turtle" /></li>
+    </ul>
+  </p>
+</form>
+{% endblock %}
