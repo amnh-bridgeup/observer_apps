@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title %}
+Turtle Search Results
+{% endblock %}
+
+{% block content_header %}
+  <h1>{{ expedition }} -- {{ location }}</h1>
+{% endblock %}
+{% block content %}
+
+<p style="font-style: italic">(Please click on a Pit Tag ID below to select the correct turtle and make a new observation)</p>
+
+{% if found_turtles %}
+  Turtles with Pit Tag IDs similar to <span style="font-weight: bold">{{ turtle_pit_tag_id }}</span> found!
+  <p>
+  {% for turtle in found_turtles %}
+    <ul style="width: 450px; outline: #009900 solid thin">
+      <li><span style="font-weight: bold">Pit Tag ID: <a href="{% url 'turtle_observer:new_observation' expedition_id=expedition.id location_id=location.id turtle_id=turtle.id %}">{{ turtle.turtle_pit_tag_id }}</a>
+        {% if turtle_pit_tag_id == turtle.turtle_pit_tag_id %}
+          -- EXACT MATCH!
+        {% endif %}
+</span></li>
+      <li><span style="font-weight: bold">Species:</span> {{ turtle.get_turtle_species_display }}</li>
+      <li><span style="font-weight: bold">Sex:</span> {{ turtle.get_turtle_sex_display }}</li>
+    </ul>
+  {% endfor %}
+{% else %}
+    <ul>
+      <li>No turtles with any similar pit tag ID found.</li>
+    </ul>
+{% endif %}
+  </p>
+<hr>
+
+<p><a href="{% url 'turtle_observer:search' %}">Restart Turtle Observation</a></p>
+{% endblock %}

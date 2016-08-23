@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from django.forms import ModelForm
+from django.forms import ModelForm, HiddenInput
 from django.contrib.auth.models import User
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -21,6 +21,7 @@ class Location(models.Model):
 class Expedition(models.Model):
     expedition_start_date = models.DateTimeField()
     expedition_end_date = models.DateTimeField()
+    expedition_notes = models.TextField(blank=True, null=True)
     locations = models.ManyToManyField(Location)
 
     def __str__(self):
@@ -60,14 +61,14 @@ class Turtle(models.Model):
 
     def __str__(self):
         return self.turtle_pit_tag_id
-
+        
 
 @python_2_unicode_compatible
 class Observation(models.Model):
     TRAP_TYPE_CHOICES = (
         ('hoop', 'Hoop Trap'),
-        ('bask-m', 'Basking Trap M'),
-        ('bask-p', 'Basking Trap P'),
+        ('bask-m', 'Basking Trap Metal'),
+        ('bask-p', 'Basking Trap Polystyrene'),
         ('snrkl', 'By Snorkeling'),
         ('hand', 'By Hand'),
     )
@@ -94,8 +95,9 @@ class Observation(models.Model):
     turtle_id = models.IntegerField(blank=True, null=True)
     observation_legacy_id = models.CharField(max_length=200, blank=True, null=True)
     observation_date = models.DateTimeField(auto_now_add=True)
-    pond_location = models.CharField(max_length=400, blank=True, null=True)
+    location_in_pond = models.CharField(max_length=400, blank=True, null=True)
     recaptured = models.BooleanField(default=0)
+    trap_id = models.CharField(max_length=200, blank=True, null=True)
     trap_type = models.CharField(max_length=200, blank=True, null=True, choices=TRAP_TYPE_CHOICES)
     bait = models.CharField(max_length=200, blank=True, null=True)
     age_in_years = models.CharField(max_length=200, blank=True, null=True, choices=AGE_IN_YEARS_CHOICES)
@@ -121,4 +123,5 @@ class TurtleForm(ModelForm):
 class ObservationForm(ModelForm):
     class Meta:
         model = Observation
-        fields = ['expedition','location','turtle_id','pond_location', 'trap_type', 'bait', 'age_in_years', 'mass_in_grams', 'carapace_length_cm', 'carapace_width_cm', 'carapace_height_cm', 'plastron_length_cm', 'observation_notes', 'observers']
+        widgets = {'turtle_id': HiddenInput()}
+        fields = ['expedition','location','turtle_id','location_in_pond','trap_type','trap_id','bait','age_in_years','mass_in_grams','carapace_length_cm','carapace_width_cm','carapace_height_cm','plastron_length_cm','observation_notes','observers']

@@ -4,17 +4,32 @@
 Search For A Turtle
 {% endblock %}
 
+{% block pagename %}searchpage{% endblock %}
+
 {% block content_header %}
-  <h1>{{ expedition }}</h1>
+  <h1>Search For Turtles</h1>
 {% endblock %}
 {% block content %}
 
-<p style="font-style: italic">(Select Location, Enter Pit Tag ID and press Search For Turtle, or just Add New Turtle)</p>
+<p style="font-style: italic">(Select Expedition, Select Location, Enter Pit Tag ID and press Search For Turtle, or just Add New Turtle)</p>
 
 <form action="{% url 'turtle_observer:search' %}" method="POST">
 {% csrf_token %}
   <p>
     <ul>
+      <li><label for="expedition">Your Expedition: </label> 
+        <select name="expedition" id="expedition">
+          {% for each_expedition in expedition_list.all %}
+            {% if each_expedition.expedition_start_date == expedition.expedition_start_date %}
+              <option value="{{ each_expedition.id }}" selected>{{ each_expedition }}</option>
+            {% else %}
+              <option value="{{ each_expedition.id }}">{{ each_expedition }}</option>
+            {% endif %}
+          {% empty %}
+              <option value="">No expeditions!</option>
+          {% endfor %}
+        </select>
+      </li>
       <li><label for="location">Your Location: </label> 
         <select name="location" id="location">
           {% for each_location in location_list.all %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title %}
+All Observations
+{% endblock %}
+
+{% block content_header %}
+  <h1>Pit Tag ID {{ turtle.turtle_pit_tag_id }}</h1>
+{% endblock %}
+{% block content %}
+
+<ul>
+  <li><span style="font-weight: bold">Species:</span> {{ turtle.get_turtle_species_display }}</li>
+  <li><span style="font-weight: bold">Sex:</span> {{ turtle.get_turtle_sex_display }}</li>
+</ul>
+
+<p style="font-weight: bold"><a href="{% url 'turtle_observer:new_observation' expedition_id=expeditionId location_id=locationId turtle_id=turtle.id %}">Enter New Observation For This Turtle</a></p>
+
+<hr>
+
+<h2>All Observations</h2>
+<p style="font-weight: italic">(Click on a date to see all observation details)</p>
+<ul>
+  {% if observations %}
+    {% for observation in observations %}
+      <li><span style="font-weight: bold"><a href="{% url 'turtle_observer:observation_detail' turtle_id=turtle.id observation_id=observation.id %}">{{ observation.observation_date.date }}</a></span> -- {{ observation.location }}, Age: {{ observation.age_in_years }}, Observed by: 
+        {% for obv in observation.observers.all %}
+          {{ obv.observer_name }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+      </li>
+    {% endfor %}
+  {% else %}
+      <li>No observations.</li>
+  {% endif %}
+</ul>
+
+<p><a href="{% url 'turtle_observer:index' %}">Restart Turtle Observation</a></p>
+{% endblock %}

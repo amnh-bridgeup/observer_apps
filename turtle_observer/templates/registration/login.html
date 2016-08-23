@@ -28,7 +28,7 @@ Black Rock Turtle DB Login
     <li>{{ form.password.label_tag }} &nbsp;{{ form.password }}</li>
     <li>&nbsp;</li>
     <li><input type="hidden" name="next" value="{{ next }}" /></li>
-    <li><input type="submit" value="login" /> &nbsp;<a href="{% url 'django.contrib.auth.views.password_reset' %}">Lost password?</a></li>
+    <li><input type="submit" value="login" /> &nbsp;<a href="{% url 'password_reset' %}">Lost password?</a></li>
   </ul>  
 </form>
 

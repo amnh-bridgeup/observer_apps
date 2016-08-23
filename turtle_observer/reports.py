@@ -1,4 +1,4 @@
-from .models import Turtle
+from .models import Turtle, Observation
 from model_report.report import reports, ReportAdmin
 
 
@@ -17,7 +17,22 @@ class TurtleBySpeciesReport(ReportAdmin):
 reports.register('turtle-by-species-report', TurtleBySpeciesReport)
 
 
-'''class TurtleReport(ReportAdmin):
+'''class ObservationByPitTagReport(ReportAdmin):
+    title = _('Observations By Pit Tag')
+    model = Observation
+    fields = [
+        'turtle_species',
+        'turtle_sex',
+        'turtle_pit_tag_id',
+    ]
+    list_group_by = ('turtle_pit_tag_id', )
+    list_filter = ('turtle_sex',)
+    type = 'report'
+
+reports.register('observation-by-pit-tag-report', ObservationByPitTagReport)
+
+
+class TurtleReport(ReportAdmin):
     model = Turtle
     fields = [
         'turtle_species',

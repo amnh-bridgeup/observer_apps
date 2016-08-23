@@ -3,7 +3,9 @@ from datetime import datetime
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.postgres.search import TrigramSimilarity
 from django.core.urlresolvers import reverse
+from django.db.models import Count, Avg, Max
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.template import loader
@@ -15,10 +17,6 @@ from .models import TurtleForm, ObservationForm
 
 def index(request):
     return render(request, 'turtle_observer/index.html')
-
-
-#def reports(request):
-#    return render(request, 'turtle_observer/index.html')
 
 
 def login_submit(request):
@@ -52,16 +50,27 @@ def logout_view(request):
     return HttpResponseRedirect(reverse('turtle_observer:index', kwargs={}))
 
 
-@login_required(login_url="login/")
+@login_required(login_url="/login/")
+def reports(request):
+    return render(request, 'turtle_observer/reports.html')
+
+
+@login_required(login_url="/login/")
+def reports(request):
+    return render(request, 'turtle_observer/reports.html')
+
+
+@login_required(login_url="/login/")
 def search(request):
     # Get current expedition and locations
-    this_expedition = Expedition.objects.get(expedition_start_date__lte=timezone.now(), expedition_end_date__gte=timezone.now())
+    expeditions = Expedition.objects.all().order_by('-expedition_start_date')
     expedition_locations = Location.objects.all().order_by('location_lat').order_by('location_long')
 
-    context = {'expedition': this_expedition, 'location_list': expedition_locations}
+    context = {'expedition_list': expeditions, 'location_list': expedition_locations}
 
     if request.method == 'POST':
         # Get the location
+        this_expedition = Expedition.objects.get(id=request.POST['expedition'])
         this_location = Location.objects.get(location_code=request.POST['location'])
         context['location'] = this_location
 
@@ -73,23 +82,50 @@ def search(request):
         else:
             # Search for turtle
             try:
-                found_turtle = Turtle.objects.get(turtle_pit_tag_id=request.POST['turtle_pit_tag_id'])
+#                found_turtle = Turtle.objects.get(turtle_pit_tag_id=request.POST['turtle_pit_tag_id'])
+                found_turtles = Turtle.objects.annotate(similarity=TrigramSimilarity('turtle_pit_tag_id', request.POST['turtle_pit_tag_id'])).filter(similarity__gt=0.3).order_by('-similarity')
             except (KeyError, Turtle.DoesNotExist):
                 # Redisplay the search form.
                 context['turtle_pit_tag_id'] = request.POST['turtle_pit_tag_id']
-                context['error_message'] = "You didn't find a turtle with that Pit Tag ID. Try again or add a new turtle."
+                context['error_message'] = "You didn't find a turtle with any similar Pit Tag ID. Try again or add a new turtle."
 
                 return render(request, 'turtle_observer/search.html', context)
             else:
                 # Turtle found
-                context = {'turtle_id': found_turtle.id, 'expedition_id': this_expedition.id, 'location_id': this_location.id}
+                context = {'found_turtles': found_turtles,
+                           'expedition': this_expedition, 
+                           'location': this_location, 
+                           'turtle_pit_tag_id': request.POST['turtle_pit_tag_id'],
+                           }
 
-                return HttpResponseRedirect(reverse('turtle_observer:new_observation', kwargs=context))
+#                return HttpResponseRedirect(reverse('turtle_observer:results', kwargs=context))
+                return render(request, 'turtle_observer/results.html', context)
 
     return render(request, 'turtle_observer/search.html', context)
 
 
-@login_required(login_url="login/")
+@login_required(login_url="/login/")
+def observations(request, expedition_id, location_id, turtle_id):
+    this_turtle = Turtle.objects.get(pk=turtle_id)
+
+    observations = Observation.objects.filter(turtle_id=turtle_id).order_by('-observation_date')
+
+    context = {'turtle': this_turtle, 'expeditionId': expedition_id, 'locationId': location_id, 'observations': observations}
+
+    return render(request, 'turtle_observer/observations.html', context)
+
+
+@login_required(login_url="/login/")
+def observation_detail(request, turtle_id, observation_id):
+    this_turtle = Turtle.objects.get(pk=turtle_id)
+    this_observation = Observation.objects.get(pk=observation_id)
+
+    context = {'turtle': this_turtle, 'observation': this_observation}
+
+    return render(request, 'turtle_observer/observation_detail.html', context)
+
+
+@login_required(login_url="/login/")
 def new_turtle(request, expedition_id, location_id):
     this_expedition = Expedition.objects.get(pk=expedition_id)
     this_location = Location.objects.get(pk=location_id)
@@ -114,7 +150,7 @@ def new_turtle(request, expedition_id, location_id):
     return render(request, 'turtle_observer/new_turtle.html', context)
 
 
-@login_required(login_url="login/")
+@login_required(login_url="/login/")
 def new_observation(request, expedition_id, location_id, turtle_id):
     this_expedition = Expedition.objects.get(pk=expedition_id)
     this_location = Location.objects.get(pk=location_id)

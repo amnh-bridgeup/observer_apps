@@ -10,27 +10,33 @@ Add A New Observation
 {% block content %}
 
 {% if turtle %}
-Turtle with Pit Tag ID {{ turtle.turtle_pit_tag_id }} found!
-<ul>
-  <li>Species: {{ turtle.get_turtle_species_display }}
-  <li>Sex: {{ turtle.get_turtle_sex_display }}
-</ul>
+  Turtle with Pit Tag ID <span style="font-weight: bold">{{ turtle.turtle_pit_tag_id }}</span>
+  <ul>
+    <li><span style="font-weight: bold">Species:</span> {{ turtle.get_turtle_species_display }}</li>
+    <li><span style="font-weight: bold">Sex:</span> {{ turtle.get_turtle_sex_display }}</li>
+  </ul>
 
-Last 3 observations:
-<ul>
-  {% if last_observed %}
-    {% for observation in last_observed %}
-      <li>{{ observation.observation_date.date }} -- {{ observation.location }}, Age: {{ observation.age_in_years }}</li>
-    {% endfor %}
-  {% else %}
-      <li>No observations.</li>
-  {% endif %}
-</ul>
+  <p>Last 3 observations:</p>
+  <ul>
+    {% if last_observed %}
+      {% for observation in last_observed %}
+        <li><span style="font-weight: bold"><a href="{% url 'turtle_observer:observation_detail' turtle_id=turtle.id observation_id=observation.id %}">{{ observation.observation_date.date }}</a></span> -- {{ observation.location }}, Age: {{ observation.age_in_years }}, Observed by: 
+          {% for obv in observation.observers.all %}
+            {{ obv.observer_name }}{% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        </li>
+      {% endfor %}
+
+  </ul>
+  <p style="font-weight: bold"><a href="{% url 'turtle_observer:observations' expedition_id=expedition.id location_id=location.id turtle_id=turtle.id %}">See all observations</a></p>
+    {% else %}
+        <li>No observations.</li>
+    </ul>
+    {% endif %}
 {% endif %}
 <hr>
 
 <h2>Add New Observation</h2>
-<p style="font-style: italic">(Ctrl- or command-click to add several observers, click again to remove observer)</p>
 
 <form action="{% url 'turtle_observer:new_observation' expedition_id=expedition.id location_id=location.id turtle_id=turtle.id %}" method="POST">
 {% csrf_token %}
@@ -40,6 +46,7 @@ Last 3 observations:
     <li><input type="submit" name="submit" value="Add New Observation" /></li>
   </ul>
 </form>
+<p style="font-style: italic">(Ctrl- or command-click to add several observers, click again to remove observer)</p>
 
-<p><a href="{% url 'turtle_observer:index' %}">Restart Turtle Observation</a></p>
+<p><a href="{% url 'turtle_observer:search' %}">Restart Turtle Observation</a></p>
 {% endblock %}

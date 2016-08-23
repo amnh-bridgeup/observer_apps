@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title %}
+Observation Detail
+{% endblock %}
+
+{% block content_header %}
+  <h1>{{ observation.expedition }}</h1>
+{% endblock %}
+{% block content %}
+
+Turtle Pit Tag ID <span style="font-weight: bold">{{ turtle.turtle_pit_tag_id }}</span>
+<ul>
+  <li><span style="font-weight: bold">Species:</span> {{ turtle.get_turtle_species_display }}
+  <li><span style="font-weight: bold">Sex:</span> {{ turtle.get_turtle_sex_display }}
+</ul>
+<hr>
+
+<h2>Observation Detail</h2>
+
+<h3>{{ observation.observation_date.date }} -- {{ observation.location }}</h3>
+
+<ul>
+  <li><span style="font-weight: bold">Location In Pond:</span> {{ observation.location_in_pond }}</li>
+
+  <hr>
+
+  <li><span style="font-weight: bold">Trap ID:</span> {{ observation.trap_id }}</li>
+  <li><span style="font-weight: bold">Trap Type:</span> {{ observation.get_trap_type_display }}</li>
+  <li><span style="font-weight: bold">Bait:</span> {{ observation.bait }}</li>
+  <li><span style="font-weight: bold">Age In Years:</span> {{ observation.get_age_in_years_display }}</li>
+
+  <hr>
+
+  <li><span style="font-weight: bold">Mass In Grams:</span> {{ observation.mass_in_grams }}</li>
+  <li><span style="font-weight: bold">Carapace Length (cm):</span> {{ observation.carapace_length_cm }}</li>
+  <li><span style="font-weight: bold">Carapace Width (cm):</span> {{ observation.carapace_width_cm }}</li>
+  <li><span style="font-weight: bold">Carapace Height (cm):</span> {{ observation.carapace_height_cm }}</li>
+  <li><span style="font-weight: bold">Plastron Length (cm):</span> {{ observation.plastron_length_cm }}</li>
+
+  <hr>
+
+  <li><span style="font-weight: bold">Observation Notes:</span> {{ observation.observation_notes }}</li>
+
+  <hr>
+
+  <li><span style="font-weight: bold">Observers:</span> 
+    {% for obv in observation.observers.all %}
+      {{ obv.observer_name }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+  </li>
+</ul>
+
+<p style="font-weight: bold"><a href="{% url 'turtle_observer:observations' expedition_id=observation.expedition.id location_id=observation.location.id turtle_id=turtle.id %}">Back To All Observations</a></p>
+
+<p><a href="{% url 'turtle_observer:search' %}">Restart Turtle Observation</a></p>
+{% endblock %}

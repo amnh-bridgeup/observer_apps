@@ -14,21 +14,20 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 
-try:
-    from django.conf.urls.defaults import *
-except ImportError:
-    from django.conf.urls import include, patterns, url
-
+from django.conf.urls import include, url
 from django.contrib.auth import views as auth_views
 
 from django.contrib import admin
 admin.autodiscover()
 
+#from model_report import report
+#report.autodiscover()
+
 
 urlpatterns = [
     url(r'^', include('turtle_observer.urls')),
+    url(r'^', include('django.contrib.auth.urls')),
     url(r'^login/$', auth_views.login, {'template_name': 'turtle_observer/registration/login.html'}),
     url(r'^logout/$', auth_views.logout, {'template_name': 'turtle_observer/registration/logout.html'}),
-    url(r'^password_reset/$', auth_views.password_reset),
     url(r'^admin/', include(admin.site.urls)),
 ]

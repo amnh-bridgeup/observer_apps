@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title %}
+Turtle Reports
+{% endblock %}
+
+{% block pagename %}reportpage{% endblock %}
+
+{% block content_header %}
+  <h1>Turtle Reports</h1>
+{% endblock %}
+{% block content %}
+
+{% block container %}
+  <div class="row">
+    <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+      <div class="well sidebar-nav">
+        <ul class="nav">
+          <li class="nav-header">Coming Soon<!--{ trans "Report list" }--></li>
+          {% block sidebar %}
+          {% endblock %}
+        </ul>
+      </div><!--/.well -->
+    </div>
+  </div>
+{% endblock %}
+{% endblock %}
