@@ -123,5 +123,5 @@ class TurtleForm(ModelForm):
 class ObservationForm(ModelForm):
     class Meta:
         model = Observation
-        widgets = {'turtle_id': HiddenInput()}
+        widgets = {'turtle_id': HiddenInput(), 'expedition': HiddenInput(), }
         fields = ['expedition','location','turtle_id','location_in_pond','trap_type','trap_id','bait','age_in_years','mass_in_grams','carapace_length_cm','carapace_width_cm','carapace_height_cm','plastron_length_cm','observation_notes','observers']
