@@ -8,7 +8,7 @@ Pillow==3.3.0
 psycopg2==2.6.1
 PyPDF2==1.26.0
 reportlab==3.3.0
-requests==2.9.1
+requests>=2.20.0
 six==1.10.0
 whitenoise==2.0.6
 xhtml2pdf==0.0.6
